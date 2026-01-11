@@ -1,4 +1,5 @@
-﻿using Gmail.Infrastructure.Common;
+﻿using DotNetEnv;
+using Gmail.Infrastructure.Common;
 using Gmail.Infrastructure.Data.Configurations;
 using Gmail.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,16 +8,10 @@ namespace Gmail.Infrastructure.Data
 {
     public class GmailDbContext : DbContext
     {
-        private string ConnectionString;
-
-        public GmailDbContext(string connectionString)
-        {
-            this.ConnectionString = connectionString;
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            base.OnConfiguring(optionsBuilder.UseSqlServer(ConnectionString));
+            Env.Load();
+            base.OnConfiguring(optionsBuilder.UseSqlServer(Env.GetString("CONNECTION_STRING")));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
