@@ -2,7 +2,7 @@
 
 namespace Gmail.Core.Models.User
 {
-    public class UserFormViewModel
+    public class UserCredentials
     {
         [RegularExpression("[A-Za-z ]+")]
         public string Name { get; set; } = string.Empty;

@@ -26,7 +26,7 @@ namespace Gmail.Infrastructure.Data.Models
 
         [Required]
         [ForeignKey(nameof(MailId))]
-        public Mail Mail { get; set; }
+        public virtual Mail Mail { get; set; }
         public string MailId { get; set; }
     }
 }

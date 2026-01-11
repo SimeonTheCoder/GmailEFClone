@@ -30,10 +30,10 @@ namespace Gmail.Infrastructure.Data.Models
 
         [Required]
         [ForeignKey(nameof(SenderId))]
-        public EmailAddress Sender { get; set; }
+        public virtual EmailAddress Sender { get; set; }
         public string SenderId { get; set; }
 
         [Required]
-        public List<MailRecipient> Recipients { get; set; }
+        public virtual List<MailRecipient> Recipients { get; set; }
     }
 }

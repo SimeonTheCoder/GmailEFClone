@@ -8,10 +8,15 @@ namespace Gmail.Infrastructure.Data
 {
     public class GmailDbContext : DbContext
     {
+        public GmailDbContext(DbContextOptions options) : base(options)
+        {
+
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             Env.Load();
-            base.OnConfiguring(optionsBuilder.UseSqlServer(Env.GetString("CONNECTION_STRING")));
+            base.OnConfiguring(optionsBuilder.UseLazyLoadingProxies().UseSqlServer(Env.GetString("CONNECTION_STRING")));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

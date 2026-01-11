@@ -16,7 +16,7 @@ namespace Gmail.Infrastructure.Data.Models
 
         [Required]
         [ForeignKey(nameof(EmailId))]
-        public EmailAddress Email { get; set; }
+        public virtual EmailAddress Email { get; set; }
         public string EmailId { get; set; }
 
         [MaxLength(MaxNameLength)]
