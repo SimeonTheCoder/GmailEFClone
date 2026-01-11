@@ -9,6 +9,8 @@ namespace Gmail.UI
     {
         public ConsoleGraphics g { get; set; }
 
+        private int selector = 0;
+
         public ConsoleUI()
         {
             this.g = new ConsoleGraphics();
@@ -42,10 +44,7 @@ namespace Gmail.UI
             string name = Prompt("Name (optional)", 2);
 
             if (password != repeatPassword)
-            {
-                //g.Print("Passwords do not match!", ConsoleColor.Red);
                 throw new Exception("Passwords do not match!");
-            }
 
             UserCredentials credentials = new()
             {
@@ -66,10 +65,7 @@ namespace Gmail.UI
 
             Console.ForegroundColor = ConsoleGraphics.DefaultColor;
 
-            Console.SetCursorPosition(0, g.CurrRow - 1);
-            Console.Write("From: ");
-            Console.SetCursorPosition(10, g.CurrRow - 1);
-            Console.Write(senderMail);
+            TablePrint(["From: ", senderMail], [0, 10], [ConsoleGraphics.AccentColor, ConsoleColor.Gray]);
 
             string recipients = Prompt("To", 1);
 
@@ -111,10 +107,11 @@ namespace Gmail.UI
 
         public string Prompt(string question, int col = 1, ConsoleColor color = ConsoleGraphics.AccentColor)
         {
-            g.Print($"{question}: ");
+            Console.ForegroundColor = color;
+            g.Print($"{question}: ", color);
             Console.SetCursorPosition(g.GetXFromCol(col), g.CurrRow - 1);
 
-            Console.ForegroundColor = color;
+            Console.ForegroundColor = ConsoleColor.White;
 
             return Console.ReadLine();
         }
@@ -134,6 +131,87 @@ namespace Gmail.UI
         public void Error(string error)
         {
             g.Print(error, ConsoleColor.Red);
+        }
+
+        public void RenderInbox(List<InboxMail> inbox)
+        {
+            this.selector = Math.Min(selector, inbox.Count - 1);
+
+            g.Clear();
+            g.Print("Inbox", ConsoleColor.Cyan);
+
+            TablePrint(["SI", "RECIPIENTS", "| SUBJECT"], [0, 4, 30], [ConsoleColor.White, ConsoleColor.White, ConsoleColor.White]);
+            Console.ForegroundColor = ConsoleGraphics.DefaultColor;
+
+            int mailIndex = 0;
+
+            foreach (InboxMail mail in inbox)
+            {
+                if (mailIndex++ == selector)
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                else
+                    Console.ForegroundColor = ConsoleGraphics.DefaultColor;
+
+                string bookmarkStr = string.Empty;
+
+                bookmarkStr += mail.IsStarred ? "*" : ".";
+                bookmarkStr += mail.IsImportant ? "I" : ".";
+
+                string recipientsStr = string.Join(", ", mail.Mail.Recipients.Select(r => r.Address.Address));
+
+                if (recipientsStr.Length > 22)
+                    recipientsStr = recipientsStr.Substring(0, 22) + "...";
+
+                TablePrint([bookmarkStr, recipientsStr, "| " + mail.Mail.Subject], [0, 4, 30], [Console.ForegroundColor, Console.ForegroundColor, Console.ForegroundColor]);
+            }
+
+            g.EmptyLine();
+        }
+
+        public void TablePrint(string[] strings, int[] columns, ConsoleColor[] colors)
+        {
+            for (int i = 0; i < strings.Length; i ++)
+            {
+                Console.ForegroundColor = colors[i];
+                Console.SetCursorPosition(columns[i], g.CurrRow);
+                Console.Write(strings[i]);
+            }
+
+            g.CurrRow++;
+        }
+
+        public void RenderMail(Mail mail)
+        {
+            g.Clear();
+
+            TablePrint(["Subject", mail.Subject], [0, 10], [ConsoleColor.Magenta, ConsoleColor.Gray]);
+            TablePrint(["From", mail.Sender.Address], [0, 10], [ConsoleColor.Magenta, ConsoleColor.Gray]);
+            TablePrint(["To", string.Join(", ", mail.Recipients.Select(r => r.Address.Address))], [0, 10], [ConsoleColor.Magenta, ConsoleColor.Gray]);
+
+            g.Print(new string('=', Console.BufferWidth));
+            g.EmptyLine();
+
+            g.Print(mail.Content);
+            g.CurrRow += mail.Content.ToCharArray().Where(c => c == '\n').Count() + 1;
+
+            g.Print(new string('=', Console.BufferWidth));
+
+            g.EmptyLine();
+        }
+
+        public void SelectorUp()
+        {
+            this.selector = Math.Max(0, --selector);
+        }
+
+        public void SelectorDown()
+        {
+            this.selector++;
+        }
+
+        public int GetSelectorIndex()
+        {
+            return this.selector;
         }
     }
 }

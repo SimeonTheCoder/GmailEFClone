@@ -24,8 +24,9 @@ public class Program
 
         var userService = new UserService(repository);
         var mailService = new MailService(repository);
+        var inboxMailService = new InboxMailService(repository);
 
-        var engine = new Engine(userService, mailService);
+        var engine = new Engine(userService, mailService, inboxMailService);
 
         var manager = new ApplicationManager(engine);
 

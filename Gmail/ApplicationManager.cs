@@ -5,6 +5,7 @@ using Gmail.Core.Services;
 using Gmail.Infrastructure.Data.Models;
 using Gmail.Runner;
 using Gmail.UI;
+using System;
 
 namespace Gmail
 {
@@ -23,6 +24,8 @@ namespace Gmail
 
         public void Run()
         {
+            bool readingMode = false;
+
             while (true)
             {
                 try
@@ -34,17 +37,85 @@ namespace Gmail
                     }
                     else
                     {
-                        ComposeMailState();
+                        List<InboxMail> inbox = Engine.GetInboxForUser(session);
 
-                        ui.g.Print("Successfuly sent email!");
+                        if (!readingMode)
+                        {
+                            ui.RenderInbox(inbox);
+                        }
+                        else
+                        {
+                            Mail currMail = inbox[Math.Min(inbox.Count - 1, ui.GetSelectorIndex())].Mail;
+                            ui.RenderMail(currMail);
+                        }
 
-                        return;
+                        Console.SetCursorPosition(0, Console.BufferHeight - 4);
+                        Console.BackgroundColor = ConsoleColor.DarkBlue;
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.WriteLine(new string(' ', Console.BufferWidth));
+                        Console.SetCursorPosition(0, Console.BufferHeight - 4);
+
+                        ui.g.CurrRow = Console.BufferHeight - 4;
+                        ui.TablePrint(
+                            ["c/w/n: write", "r: read", "i: inbox", "u: up", "d: down", "q/e: quit", "l: logout"],
+                            [0, 10, 20, 30, 40, 50, 60],
+                            [ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.Gray]
+                        );
+
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        
+                        Console.SetCursorPosition(0, Console.BufferHeight - 3);
+                        Console.WriteLine(new string(' ', Console.BufferWidth));
+                        Console.SetCursorPosition(0, Console.BufferHeight - 3);
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        string command = Console.ReadLine().ToLower().Trim();
+
+                        Console.BackgroundColor = ConsoleColor.Black;
+
+                        switch (command)
+                        {
+                            case "compose":
+                            case "write":
+                            case "new":
+                            case "c":
+                            case "w":
+                            case "n":
+                                ComposeMailState();
+                                ui.g.Print("Successfuly sent email!");
+
+                                break;
+
+                            case "u":
+                                ui.SelectorUp();
+                                break;
+
+                            case "d":
+                                ui.SelectorDown();
+                                break;
+
+                            case "read":
+                            case "r":
+                                readingMode = true;
+                                break;
+
+                            case "inbox":
+                            case "i":
+                                readingMode = false;
+                                break;
+
+                            case "quit":
+                            case "exit":
+                            case "q":
+                            case "e":
+                                return;
+
+                            case "l":
+                            case "logout":
+                                session = null;
+                                break;
+                        }
                     }
-
-                    ui.g.Clear();
-
-                    if (!ui.PromptYesOrNo("Continue?", 2))
-                        return;
                 }
                 catch (Exception e)
                 {

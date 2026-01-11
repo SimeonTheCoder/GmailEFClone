@@ -47,9 +47,17 @@ namespace Gmail.Core.Services
                         Mail = mail
                     }
                 );
+
+                InboxMail currInboxMail = new()
+                {
+                    Address = currAddress,
+                    Mail = mail
+                };
+
+                repository.Add<InboxMail>(currInboxMail);
             }
 
-            mail.Recipients = recipientsList;
+            mail.Recipients = recipientsList;            
 
             repository.Add<Mail>(mail);
             repository.SaveChanges();

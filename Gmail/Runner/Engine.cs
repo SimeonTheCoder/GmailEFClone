@@ -10,11 +10,13 @@ namespace Gmail.Runner
     {
         private UserService userService;
         private MailService mailService;
+        private InboxMailService inboxMailService;
 
-        public Engine(UserService userService, MailService mailService)
+        public Engine(UserService userService, MailService mailService, InboxMailService inboxMailService)
         {
             this.userService = userService;
             this.mailService = mailService;
+            this.inboxMailService = inboxMailService;
         }
 
         public bool RegisterUser(UserCredentials credentials)
@@ -39,6 +41,11 @@ namespace Gmail.Runner
                 throw new NotFoundException("User not found!");
 
             return userService.GetAllAsNoTracking().FirstOrDefault(u => u.Email.Address == user.Email);
+        }
+
+        public List<InboxMail> GetInboxForUser(User user)
+        {
+            return inboxMailService.GetAll().Where(m => m.Address.Address == user.Email.Address).ToList();
         }
     }
 }
