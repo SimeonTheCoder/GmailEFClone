@@ -26,6 +26,7 @@
         public void EmptyLine()
         {
             CurrRow++;
+            Console.SetCursorPosition(0, CurrRow);
         }
 
         public int GetXFromCol(int col)

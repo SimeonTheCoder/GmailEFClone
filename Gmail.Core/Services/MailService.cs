@@ -17,7 +17,7 @@ namespace Gmail.Core.Services
 
         public void Add(MailDTO data)
         {
-            List<EmailAddress> existingEmails = repository.AllAsNoTracking<EmailAddress>().ToList();
+            List<EmailAddress> existingEmails = repository.All<EmailAddress>().ToList();
 
             EmailAddress senderMail = existingEmails.FirstOrDefault(e => e.Address == data.SenderMail);
 

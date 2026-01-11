@@ -1,4 +1,5 @@
 ﻿using Gmail.Core.Exceptions;
+using Gmail.Core.Models.Mail;
 using Gmail.Core.Models.User;
 using Gmail.Core.Services;
 using Gmail.Infrastructure.Data.Models;
@@ -33,11 +34,17 @@ namespace Gmail
                     }
                     else
                     {
-                        ui.g.Print("Welcome!");
+                        ComposeMailState();
+
+                        ui.g.Print("Successfuly sent email!");
+
                         return;
                     }
 
                     ui.g.Clear();
+
+                    if (!ui.PromptYesOrNo("Continue?", 2))
+                        return;
                 }
                 catch (Exception e)
                 {
@@ -104,6 +111,14 @@ namespace Gmail
                 ui.Error(e.Message);
                 return;
             }
+        }
+
+        private void ComposeMailState()
+        {
+            ui.g.Clear();
+
+            MailDTO mailDTO = ui.ComposeMailScreen(session.Email.Address);
+            Engine.SendMail(mailDTO);
         }
     }
 }
