@@ -17,6 +17,7 @@ namespace Gmail.Infrastructure.Data.Models
 
         [Required]
         [MaxLength(MaxEmailLength)]
+        [EmailAddress]
         public string Address { get; set; }
     }
 }

@@ -21,5 +21,8 @@ namespace Gmail.Infrastructure.Data.Models
 
         [MaxLength(MaxNameLength)]
         public string Name { get; set; }
+
+        [Required]
+        public string PasswordHash { get; set; }
     }
 }
